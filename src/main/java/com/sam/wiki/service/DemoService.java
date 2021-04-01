@@ -10,9 +10,9 @@ import java.util.List;
 @Service
 public class DemoService {
     @Autowired
-    private DemoMapper temoMapper;
+    private DemoMapper demoMapper;
 
     public List<Demo> list(){
-        return temoMapper.selectByExample(null);
+        return demoMapper.selectByExample(null);
     }
 }
