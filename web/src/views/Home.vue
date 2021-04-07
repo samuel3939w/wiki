@@ -95,7 +95,7 @@
 
             onMounted(() => {
                 console.log("onMounted")
-                axios.get("http://localhost:8880/ebook/list").then((response) => {
+                axios.get(process.env.VUE_APP_SERVER + "/ebook/list").then((response) => {
                     const data = response.data;
                     ebooks.value = data.content;
                     ebooks1.books = data.content;
@@ -127,7 +127,7 @@
 </script>
 
 <style scoped>
-    .ant-avatar{
+    .ant-avatar {
         width: 50px;
         height: 50px;
         line-height: 50px;
