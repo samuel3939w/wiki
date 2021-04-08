@@ -1,5 +1,9 @@
 <template>
-  <div class="about">
-    <h1>電子書管理</h1>
-  </div>
+  <a-layout-content
+          :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
+  >
+    <div class="about">
+      <h1>電子書管理</h1>
+    </div>
+  </a-layout-content>
 </template>
