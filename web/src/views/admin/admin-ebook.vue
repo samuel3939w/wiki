@@ -49,28 +49,28 @@
                     slots: {customRender: 'cover'}
                 },
                 {
-                    title: '名称',
+                    title: '名稱',
                     dataIndex: 'name'
                 },
                 {
-                    title: '分类一',
+                    title: '分類一',
                     key: 'category1Id',
                     dataIndex: 'category1Id'
                 },
                 {
-                    title: '分类二',
+                    title: '分類二',
                     dataIndex: 'category2Id'
                 },
                 {
-                    title: '文档数',
+                    title: '文檔數',
                     dataIndex: 'docCount'
                 },
                 {
-                    title: '阅读数',
+                    title: '閱讀數',
                     dataIndex: 'viewCount'
                 },
                 {
-                    title: '点赞数',
+                    title: '點讚數',
                     dataIndex: 'voteCount'
                 },
                 {
