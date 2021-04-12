@@ -2,6 +2,11 @@
     <a-layout-content
             :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
+        <p>
+            <a-button type="primary" @click="add()" size="large">
+                新增
+            </a-button>
+        </p>
         <a-table
                 :columns="columns"
                 :row-key="record => record.id"
@@ -46,7 +51,7 @@
                 <a-input v-model:value="ebook.category2Id"/>
             </a-form-item>
             <a-form-item label="描述">
-                <a-input v-model:value="ebook.desc" type="textarea"/>
+                <a-input v-model:value="ebook.description" type="textarea"/>
             </a-form-item>
         </a-form>
     </a-modal>
@@ -130,7 +135,7 @@
              * 表格点击页码时触发
              */
             const handleTableChange = (pagination: any) => {
-                console.log("看看自带的分页参数都有啥：" + pagination);
+                console.log("看看自帶的分頁參數都有啥：" + pagination);
                 handleQuery({
                     page: pagination.current,
                     size: pagination.pageSize
@@ -166,6 +171,14 @@
                 ebook.value = record
             };
 
+            /**
+             * 新增
+             */
+            const add = () => {
+                modalVisible.value = true;
+                ebook.value = {}
+            };
+
             onMounted(() => {
                 handleQuery({
                     page: 1,
@@ -179,7 +192,10 @@
                 columns,
                 loading,
                 handleTableChange,
+
                 edit,
+                add,
+
                 ebook,
                 modalVisible,
                 modalLoading,
