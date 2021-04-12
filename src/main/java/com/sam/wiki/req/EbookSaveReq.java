@@ -1,6 +1,6 @@
-package com.sam.wiki.resp;
+package com.sam.wiki.req;
 
-public class EbookResp {
+public class EbookSaveReq {
     private Long id;
 
     private String name;
