@@ -1,8 +1,14 @@
 package com.sam.wiki.req;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.NotNull;
+
 public class PageReq {
+    @NotNull(message = "【頁碼】不能為空")
     private int page;
 
+    @NotNull(message = "【每頁條數】不能為空")
+    @Max(value = 1000, message = "【每頁條數】不能超過1000")
     private int size;
 
     public int getPage() {
