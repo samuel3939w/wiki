@@ -1,11 +1,11 @@
 package com.sam.wiki.req;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 
 public class EbookSaveReq {
     private Long id;
 
-    @NotNull(message = "【名稱】不能為空")
+    @NotBlank(message = "【名稱】不能為空")
     private String name;
 
     private Long category1Id;
