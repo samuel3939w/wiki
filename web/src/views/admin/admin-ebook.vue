@@ -28,7 +28,7 @@
                 :loading="loading"
                 @change="handleTableChange"
         >
-            <template #cover="{ text: cover }">
+            <template #cover="{ text:cover }">
                 <img v-if="cover" :src="cover" alt="avatar"/>
             </template>
             <template v-slot:action="{ text, record }">
