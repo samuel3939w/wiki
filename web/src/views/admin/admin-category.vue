@@ -65,7 +65,15 @@
                 <a-input v-model:value="category.name"/>
             </a-form-item>
             <a-form-item label="父分類">
-                <a-input v-model:value="category.parent"/>
+                <a-select
+                        v-model:value="category.parent"
+                        ref="select"
+                >
+                    <a-select-option value="0">無</a-select-option>
+                    <a-select-option v-for="c in level1" :key="c.id" :value="c.id" :disabled="category.id === c.id">
+                        {{c.name}}
+                    </a-select-option>
+                </a-select>
             </a-form-item>
             <a-form-item label="順序">
                 <a-input v-model:value="category.sort"/>
@@ -121,31 +129,48 @@
              * }]
              */
             const level1 = ref(); // 一级分类树，children属性就是二级分类
-            level1.value=[];
+            level1.value = [];
 
             /**
              * 数据查询
              **/
             const handleQuery = () => {
                 loading.value = true;
-                axios.get("/category/all", {
-                    params: {
-                        name: param.value.name
-                    }
-                }).then((response) => {
-                    loading.value = false;
-                    const data = response.data;
-                    if (data.success) {
-                        categorys.value = data.content;
-                        console.log("原始數據:",categorys.value);
+                //判斷name是否有值,有值則用第一個請求(不使用樹狀結構),沒有值則使用第二個請求
+                if (param.value.name) {
+                    axios.get("/category/all", {
+                        params: {
+                            name: param.value.name
+                        }
+                    }).then((response) => {
+                        loading.value = false;
+                        const data = response.data;
+                        if (data.success) {
+                            level1.value = data.content;
+                        } else {
+                            message.error(data.message);
+                        }
+                    });
+                } else {
+                    axios.get("/category/all", {
+                        params: {
+                            name: param.value.name
+                        }
+                    }).then((response) => {
+                        loading.value = false;
+                        const data = response.data;
+                        if (data.success) {
+                            categorys.value = data.content;
+                            console.log("原始數據:", categorys.value);
 
-                        level1.value=Tool.array2Tree(categorys.value,0);
-                        console.log("樹狀結構:",level1);
-                    } else {
-                        message.error(data.message);
-                    }
+                            level1.value = Tool.array2Tree(categorys.value, 0);
+                            console.log("樹狀結構:", level1);
+                        } else {
+                            message.error(data.message);
+                        }
+                    });
+                }
 
-                });
             };
 
             // -------- 表单 ---------
@@ -156,7 +181,7 @@
                 modalLoading.value = true;
 
                 //驗證提交內容
-                let name=param.name;
+                let name = param.name;
                 const parent = parseInt(param.parent);
                 const sort = parseInt(param.sort);
                 if (name == "" || name == undefined) {
