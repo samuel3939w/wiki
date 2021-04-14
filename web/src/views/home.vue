@@ -2,20 +2,16 @@
     <a-layout-sider width="200" style="background: #fff">
         <a-menu mode="inline" :style="{ height: '100%', borderRight: 0 }" @click="handleClick">
             <a-menu-item key="welcome">
-                <router-link :to="'/'">
-                    <MailOutlined/>
-                    <span>歡迎</span>
-                </router-link>
+                <MailOutlined/>
+                <span>歡迎</span>
             </a-menu-item>
             <a-sub-menu v-for="item in level1" :key="item.id">
                 <template v-slot:title>
                     <span><user-outlined/>{{item.name}}</span>
                 </template>
                 <a-menu-item v-for="child in item.children" :key="child.id">
-                    <a-menu-item key="2">option2</a-menu-item>
                     <MailOutlined/>
                     <span>{{child.name}}</span>
-                    <a-menu-item key="3">option3</a-menu-item>
                 </a-menu-item>
             </a-sub-menu>
         </a-menu>
@@ -28,7 +24,11 @@
       minHeight: '280px',
     }"
     >
+        <div class="welcome" v-show="isShowWelcome">
+            <h1>歡迎使用山姆知識庫</h1>
+        </div>
         <a-list
+                v-show="!isShowWelcome"
                 item-layout="vertical"
                 size="large"
                 :grid="{ gutter: 20, column: 3 }"
@@ -103,8 +103,15 @@
                 });
             };
 
-            const handleClick = () => {
-                console.log("menu click")
+            const isShowWelcome = ref(true);
+
+            const handleClick = (value: any) => {
+                // if (value.key === 'welcome') {
+                //     isShowWelcome.value = true;
+                // } else {
+                //     isShowWelcome.value = false;
+                // }
+                isShowWelcome.value = value.key === 'welcome';
             };
 
             onMounted(() => {
@@ -139,6 +146,7 @@
                 pagination,
                 actions,
                 level1,
+                isShowWelcome,
 
                 handleClick
             };
