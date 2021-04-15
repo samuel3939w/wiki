@@ -5,7 +5,7 @@
                 <MailOutlined/>
                 <span>歡迎</span>
             </a-menu-item>
-            <a-sub-menu v-for="item in level1" :key="item.id">
+            <a-sub-menu v-for="item in level1" :key="item.id" @click.capture="handleClickForCategory1(item.id)">
                 <template v-slot:title>
                     <span><user-outlined/>{{item.name}}</span>
                 </template>
@@ -96,7 +96,7 @@
 
                         level1.value = [];
                         level1.value = Tool.array2Tree(categorys, 0);
-                        console.log("树形结构：", level1.value);
+                        console.log("樹形結構：", level1.value);
                     } else {
                         message.error(data.message);
                     }
@@ -105,21 +105,46 @@
 
             const isShowWelcome = ref(true);
             let categoryId2 = 0;
+            let categoryId1 = 0;
 
-            const handleQueryEbook = () => {
-                axios.get("/ebook/list", {
-                    params: {
-                        page: 1,
-                        size: 1000,
-                        categoryId2: categoryId2
-                    },
-                }).then((response) => {
-                    const data = response.data;
-                    ebooks.value = data.content.list;
-                    //ebooks1.books = data.content;
-                });
+            const handleQueryEbook = (categoryId1: any=null) => {
+                //判斷是否有一級分類,如果有則按照衣及分類搜尋列表,如果沒有則搜尋二級分類
+                if (categoryId1) {
+                    axios.get("/ebook/list", {
+                        params: {
+                            page: 1,
+                            size: 1000,
+                            categoryId1: categoryId1,
+                        },
+                    }).then((response) => {
+                        const data = response.data;
+                        ebooks.value = data.content.list;
+                        //ebooks1.books = data.content;
+                    });
+                } else {
+                    axios.get("/ebook/list", {
+                        params: {
+                            page: 1,
+                            size: 1000,
+                            categoryId2: categoryId2
+                        },
+                    }).then((response) => {
+                        const data = response.data;
+                        ebooks.value = data.content.list;
+                        //ebooks1.books = data.content;
+                    });
+                }
+
             }
 
+            //一級分類導航點擊事件
+            const handleClickForCategory1 = (value: any) => {
+                categoryId1 = value
+                isShowWelcome.value = false;
+                handleQueryEbook(categoryId1);
+            }
+
+            //其他導航點擊事件
             const handleClick = (value: any) => {
                 if (value.key === 'welcome') {
                     isShowWelcome.value = true;
@@ -154,7 +179,8 @@
                 level1,
                 isShowWelcome,
 
-                handleClick
+                handleClick,
+                handleClickForCategory1
             };
         },
     });
