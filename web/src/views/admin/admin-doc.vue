@@ -2,84 +2,91 @@
     <a-layout-content
             :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
-        <p>
-            <a-form layout="inline" :model="param">
-                <a-form-item>
-                    <a-button type="primary" @click="handleQuery()">
-                        查詢
-                    </a-button>
-                </a-form-item>
-                <a-form-item>
-                    <a-button type="primary" @click="add()">
-                        新增
-                    </a-button>
-                </a-form-item>
-            </a-form>
-        </p>
-        <a-table
-                :columns="columns"
-                :row-key="record => record.id"
-                :data-source="level1"
-                :loading="loading"
-                :pagination="false"
-        >
-            <template #cover="{ text: cover }">
-                <img v-if="cover" :src="cover" alt="avatar"/>
-            </template>
-            <template v-slot:action="{ text, record }">
-                <a-space size="small">
-                    <a-button type="primary" @click="edit(record)">
-                        编辑
-                    </a-button>
-                    <a-popconfirm
-                            title="刪除後不可恢復，確認刪除?"
-                            ok-text="是"
-                            cancel-text="否"
-                            @confirm="handleDelete(record.id)"
-                    >
-                        <a-button type="danger">
-                            删除
-                        </a-button>
-                    </a-popconfirm>
-                </a-space>
-            </template>
-        </a-table>
+        <a-row>
+            <a-col :span="8">
+                <p>
+                    <a-form layout="inline" :model="param">
+                        <a-form-item>
+                            <a-button type="primary" @click="handleQuery()">
+                                查詢
+                            </a-button>
+                        </a-form-item>
+                        <a-form-item>
+                            <a-button type="primary" @click="add()">
+                                新增
+                            </a-button>
+                        </a-form-item>
+                    </a-form>
+                </p>
+                <a-table
+                        :columns="columns"
+                        :row-key="record => record.id"
+                        :data-source="level1"
+                        :loading="loading"
+                        :pagination="false"
+                >
+                    <template #cover="{ text: cover }">
+                        <img v-if="cover" :src="cover" alt="avatar"/>
+                    </template>
+                    <template v-slot:action="{ text, record }">
+                        <a-space size="small">
+                            <a-button type="primary" @click="edit(record)">
+                                编辑
+                            </a-button>
+                            <a-popconfirm
+                                    title="刪除後不可恢復，確認刪除?"
+                                    ok-text="是"
+                                    cancel-text="否"
+                                    @confirm="handleDelete(record.id)"
+                            >
+                                <a-button type="danger">
+                                    删除
+                                </a-button>
+                            </a-popconfirm>
+                        </a-space>
+                    </template>
+                </a-table>
+            </a-col>
+            <a-col :span="16">
+                <a-form :model="doc" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
+                    <a-form-item label="名稱">
+                        <a-input v-model:value="doc.name"/>
+                    </a-form-item>
+                    <a-form-item label="父文檔">
+                        <a-tree-select
+                                v-model:value="doc.parent"
+                                style="width: 100%"
+                                :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
+                                :tree-data="treeSelectData"
+                                placeholder="請選擇父文檔"
+                                tree-default-expand-all
+                                :replaceFields="{title:'name',key:'id',value:'id'}"
+                        >
+                        </a-tree-select>
+                    </a-form-item>
+                    <a-form-item label="順序">
+                        <a-input v-model:value="doc.sort"/>
+                    </a-form-item>
+                    <a-form-item label="內容">
+                        <div id="content"></div>
+                    </a-form-item>
+                </a-form>
+            </a-col>
+        </a-row>
     </a-layout-content>
 
-    <a-modal
-            title="文檔列表"
-            v-model:visible="modalVisible"
-            :confirm-loading="modalLoading"
-            @ok="handleModalOk({
-               name:doc.name,
-               sort:doc.sort,
-               parent:doc.parent
-            })"
-    >
-        <a-form :model="doc" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
-            <a-form-item label="名稱">
-                <a-input v-model:value="doc.name"/>
-            </a-form-item>
-            <a-form-item label="父文檔">
-                <a-tree-select
-                        v-model:value="doc.parent"
-                        style="width: 100%"
-                        :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
-                        :tree-data="treeSelectData"
-                        placeholder="請選擇父文檔"
-                        tree-default-expand-all
-                        :replaceFields="{title:'name',key:'id',value:'id'}"
-                >
-                </a-tree-select>
-            </a-form-item>
-            <a-form-item label="順序">
-                <a-input v-model:value="doc.sort"/>
-            </a-form-item>
-            <a-form-item label="內容">
-                <div id="content"></div>
-            </a-form-item>
-        </a-form>
-    </a-modal>
+    <!--    <a-modal-->
+    <!--            title="文檔列表"-->
+    <!--            v-model:visible="modalVisible"-->
+    <!--            :confirm-loading="modalLoading"-->
+    <!--            @ok="handleModalOk({-->
+    <!--               name:doc.name,-->
+    <!--               sort:doc.sort,-->
+    <!--               parent:doc.parent-->
+    <!--            })"-->
+    <!--    >-->
+
+    <!--    </a-modal>-->
 </template>
 
 <script lang="ts">
