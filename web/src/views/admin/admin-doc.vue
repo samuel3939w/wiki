@@ -2,7 +2,7 @@
     <a-layout-content
             :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
-        <a-row>
+        <a-row :gutter="24">
             <a-col :span="8">
                 <p>
                     <a-form layout="inline" :model="param">
@@ -24,13 +24,14 @@
                         :data-source="level1"
                         :loading="loading"
                         :pagination="false"
+                        size="small"
                 >
-                    <template #cover="{ text: cover }">
-                        <img v-if="cover" :src="cover" alt="avatar"/>
+                    <template #name="{ text,record }">
+                        {{record.sort}} {{text}}
                     </template>
                     <template v-slot:action="{ text, record }">
                         <a-space size="small">
-                            <a-button type="primary" @click="edit(record)">
+                            <a-button type="primary" @click="edit(record)" size="small">
                                 编辑
                             </a-button>
                             <a-popconfirm
@@ -39,7 +40,7 @@
                                     cancel-text="否"
                                     @confirm="handleDelete(record.id)"
                             >
-                                <a-button type="danger">
+                                <a-button type="danger" size="small">
                                     删除
                                 </a-button>
                             </a-popconfirm>
@@ -48,11 +49,20 @@
                 </a-table>
             </a-col>
             <a-col :span="16">
-                <a-form :model="doc" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
-                    <a-form-item label="名稱">
-                        <a-input v-model:value="doc.name"/>
+                <p>
+                    <a-form layout="inline" :model="param">
+                        <a-form-item>
+                            <a-button type="primary" @click="handleSave()">
+                                保存
+                            </a-button>
+                        </a-form-item>
+                    </a-form>
+                </p>
+                <a-form :model="doc" layout="vertical">
+                    <a-form-item>
+                        <a-input v-model:value="doc.name" placeholder="名稱"/>
                     </a-form-item>
-                    <a-form-item label="父文檔">
+                    <a-form-item>
                         <a-tree-select
                                 v-model:value="doc.parent"
                                 style="width: 100%"
@@ -64,10 +74,10 @@
                         >
                         </a-tree-select>
                     </a-form-item>
-                    <a-form-item label="順序">
-                        <a-input v-model:value="doc.sort"/>
+                    <a-form-item>
+                        <a-input v-model:value="doc.sort" placeholder="順序"/>
                     </a-form-item>
-                    <a-form-item label="內容">
+                    <a-form-item>
                         <div id="content"></div>
                     </a-form-item>
                 </a-form>
@@ -110,16 +120,9 @@
             const columns = [
                 {
                     title: '名稱',
-                    dataIndex: 'name'
-                },
-                {
-                    title: '父文檔',
-                    key: 'parent',
-                    dataIndex: 'parent'
-                },
-                {
-                    title: '順序',
-                    dataIndex: 'sort'
+                    //dataIndex對應的是模板裡面text的值
+                    dataIndex: 'name',
+                    slots: {customRender: 'name'}
                 },
                 {
                     title: 'Action',
@@ -147,41 +150,20 @@
              **/
             const handleQuery = () => {
                 loading.value = true;
-                //判斷name是否有值,有值則用第一個請求(不使用樹狀結構),沒有值則使用第二個請求
-                if (param.value.name) {
-                    axios.get("/doc/all", {
-                        params: {
-                            name: param.value.name
-                        }
-                    }).then((response) => {
-                        loading.value = false;
-                        const data = response.data;
-                        if (data.success) {
-                            level1.value = data.content;
-                        } else {
-                            message.error(data.message);
-                        }
-                    });
-                } else {
-                    axios.get("/doc/all", {
-                        params: {
-                            name: param.value.name
-                        }
-                    }).then((response) => {
-                        loading.value = false;
-                        const data = response.data;
-                        if (data.success) {
-                            docs.value = data.content;
-                            console.log("原始數據:", docs.value);
 
-                            level1.value = Tool.array2Tree(docs.value, 0);
-                            console.log("樹狀結構:", level1);
-                        } else {
-                            message.error(data.message);
-                        }
-                    });
-                }
+                axios.get("/doc/all").then((response) => {
+                    loading.value = false;
+                    const data = response.data;
+                    if (data.success) {
+                        docs.value = data.content;
+                        console.log("原始數據:", docs.value);
 
+                        level1.value = Tool.array2Tree(docs.value, 0);
+                        console.log("樹狀結構:", level1);
+                    } else {
+                        message.error(data.message);
+                    }
+                });
             };
 
             // -------- 表单 ---------
@@ -192,8 +174,9 @@
             const modalVisible = ref(false);
             const modalLoading = ref(false);
             const editor = new E('#content');
+            editor.config.zIndex = 0;
 
-            const handleModalOk = (param: any) => {
+            const handleSave = (param: any) => {
                 modalLoading.value = true;
 
                 //驗證提交內容
@@ -306,9 +289,6 @@
 
                 // 为选择树添加一个"无"
                 treeSelectData.value.unshift({id: 0, name: '無'});
-                setTimeout(() => {
-                    editor.create();
-                }, 100)
             };
 
             /**
@@ -324,9 +304,6 @@
 
                 // 为选择树添加一个"无"
                 treeSelectData.value.unshift({id: 0, name: '無'});
-                setTimeout(() => {
-                    editor.create();
-                }, 100)
             };
 
             const handleDelete = (id: number) => {
@@ -356,6 +333,7 @@
             }
 
             onMounted(() => {
+                editor.create();
                 handleQuery();
             });
 
@@ -372,7 +350,7 @@
                 doc,
                 modalVisible,
                 modalLoading,
-                handleModalOk,
+                handleSave,
 
                 handleDelete,
                 handleQuery,
