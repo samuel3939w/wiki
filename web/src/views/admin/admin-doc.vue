@@ -80,11 +80,12 @@
 </template>
 
 <script lang="ts">
-    import {defineComponent, onMounted, ref} from 'vue';
+    import {defineComponent, onMounted, ref, createVNode} from 'vue';
     import axios from 'axios';
-    import {message} from 'ant-design-vue';
+    import {message, Modal} from 'ant-design-vue';
     import {Tool} from '@/utils/tool';
     import {useRoute} from "vue-router";
+    import ExclamationCircleOutlined from "@ant-design/icons-vue/ExclamationCircleOutlined";
 
     export default defineComponent({
         name: 'AdminDoc',
@@ -245,7 +246,8 @@
                 }
             };
 
-            const ids: Array<string> = [];
+            const deleteIds: Array<string> = [];
+            const deleteNames: Array<string> = [];
             /**
              * 查找整根樹枝
              */
@@ -259,7 +261,8 @@
                         console.log("delete", node);
                         // 將目標ID放入結果集ids
                         //node.disabled = true;
-                        ids.push(id);
+                        deleteIds.push(id);
+                        deleteNames.push(node.name);
 
                         // 遍历所有子节点
                         const children = node.children;
@@ -309,12 +312,24 @@
 
             const handleDelete = (id: number) => {
                 getDeleteIds(level1.value, id);
-                axios.delete("/doc/delete/" + ids.join(",")).then((response) => {
-                    const data = response.data;
-                    if (data.success) {
-                        //重新加載列表
-                        handleQuery();
-                    }
+                if (deleteIds.length === 0 || deleteNames.length === 0) {
+                    message.error("刪除的文檔ID或文檔名為空!");
+                    return
+                }
+                Modal.confirm({
+                    title: '重要提醒',
+                    icon: createVNode(ExclamationCircleOutlined),
+                    content: '將刪除：【' + deleteNames.join("，") + "】刪除後不可恢復，確認刪除？",
+                    onOk() {
+                        // console.log(ids)
+                        axios.delete("/doc/delete/" + deleteIds.join(",")).then((response) => {
+                            const data = response.data; // data = commonResp
+                            if (data.success) {
+                                // 重新加载列表
+                                handleQuery();
+                            }
+                        });
+                    },
                 });
             }
 
