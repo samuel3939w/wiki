@@ -75,6 +75,9 @@
             <a-form-item label="順序">
                 <a-input v-model:value="doc.sort"/>
             </a-form-item>
+            <a-form-item label="內容">
+                <div id="content"></div>
+            </a-form-item>
         </a-form>
     </a-modal>
 </template>
@@ -86,6 +89,7 @@
     import {Tool} from '@/utils/tool';
     import {useRoute} from "vue-router";
     import ExclamationCircleOutlined from "@ant-design/icons-vue/ExclamationCircleOutlined";
+    import E from "wangeditor";
 
     export default defineComponent({
         name: 'AdminDoc',
@@ -180,6 +184,8 @@
             const doc = ref({});
             const modalVisible = ref(false);
             const modalLoading = ref(false);
+            const editor = new E('#content');
+
             const handleModalOk = (param: any) => {
                 modalLoading.value = true;
 
@@ -292,7 +298,10 @@
                 setDisable(treeSelectData.value, record.id);
 
                 // 为选择树添加一个"无"
-                treeSelectData.value.unshift({id: 0, name: '无'});
+                treeSelectData.value.unshift({id: 0, name: '無'});
+                setTimeout(() => {
+                    editor.create();
+                }, 100)
             };
 
             /**
@@ -307,11 +316,14 @@
                 treeSelectData.value = Tool.copy(level1.value);
 
                 // 为选择树添加一个"无"
-                treeSelectData.value.unshift({id: 0, name: '无'});
+                treeSelectData.value.unshift({id: 0, name: '無'});
+                setTimeout(() => {
+                    editor.create();
+                }, 100)
             };
 
             const handleDelete = (id: number) => {
-                // 清空数组，否则多次删除时，数组会一直增加
+                // 清空數組，否則多次刪除時，數組會一直增加
                 deleteIds.length = 0;
                 deleteNames.length = 0;
                 getDeleteIds(level1.value, id);
