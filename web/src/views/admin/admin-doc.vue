@@ -19,12 +19,14 @@
                     </a-form>
                 </p>
                 <a-table
+                        v-if="level1.length > 0"
                         :columns="columns"
                         :row-key="record => record.id"
                         :data-source="level1"
                         :loading="loading"
                         :pagination="false"
                         size="small"
+                        :defaultExpandAllRows="true"
                 >
                     <template #name="{ text,record }">
                         {{record.sort}} {{text}}
@@ -176,34 +178,16 @@
             const editor = new E('#content');
             editor.config.zIndex = 0;
 
-            const handleSave = (param: any) => {
+            const handleSave = () => {
                 modalLoading.value = true;
-
-                //驗證提交內容
-                let name = param.name;
-                const parent = parseInt(param.parent);
-                const sort = parseInt(param.sort);
-                if (name == "" || name == undefined) {
-                    message.error("名稱不可為空!");
-                    modalLoading.value = false;
-                    return;
-                } else if (!Number.isInteger(parent)) {
-                    message.error("父文檔只能輸入數字!");
-                    modalLoading.value = false;
-                    return;
-                } else if (!Number.isInteger(sort)) {
-                    message.error("排序只能輸入數字!");
-                    modalLoading.value = false;
-                    return;
-                }
-
                 axios.post("/doc/save", doc.value).then((response) => {
                     modalLoading.value = false;
-                    const data = response.data;
+                    const data = response.data; // data = commonResp
                     if (data.success) {
-                        modalVisible.value = false;
+                        // modalVisible.value = false;
+                        message.success("保存成功！");
 
-                        //重新加載列表
+                        // 重新加载列表
                         handleQuery();
                     } else {
                         message.error(data.message);
