@@ -153,7 +153,7 @@
             const handleQuery = () => {
                 loading.value = true;
 
-                axios.get("/doc/all").then((response) => {
+                axios.get("/doc/all/" + route.query.ebookId).then((response) => {
                     loading.value = false;
                     const data = response.data;
                     if (data.success) {
@@ -173,7 +173,7 @@
             const treeSelectData = ref();
             treeSelectData.value = [];
             const doc = ref();
-            doc.value={};
+            doc.value = {};
             const modalVisible = ref(false);
             const modalLoading = ref(false);
             const editor = new E('#content');
@@ -268,7 +268,7 @@
              * 內容查询
              **/
             const handleQueryContent = () => {
-                axios.get("/doc/find-content/"+doc.value.id).then((response) => {
+                axios.get("/doc/find-content/" + doc.value.id).then((response) => {
                     const data = response.data;
                     if (data.success) {
                         editor.txt.html(data.content)
