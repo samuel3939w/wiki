@@ -97,7 +97,7 @@ public class DocService {
             //更新
             docMapper.updateByPrimaryKey(doc);
             int count = contentMapper.updateByPrimaryKeyWithBLOBs(content);
-            if (count == 0){
+            if (count == 0) {
                 contentMapper.insert(content);
             }
         }
@@ -112,5 +112,10 @@ public class DocService {
         DocExample.Criteria criteria = docExample.createCriteria();
         criteria.andIdIn(ids);
         docMapper.deleteByExample(docExample);
+    }
+
+    public String findContent(Long id) {
+        Content content = contentMapper.selectByPrimaryKey(id);
+        return content.getContent();
     }
 }
