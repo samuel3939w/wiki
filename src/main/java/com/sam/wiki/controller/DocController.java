@@ -54,12 +54,8 @@ public class DocController {
     @GetMapping("/find-content/{id}")
     public CommonResp findContent(@PathVariable Long id) {
         CommonResp<String> resp = new CommonResp<>();
-        try {
-            String content = docService.findContent(id);
-            resp.setContent(content);
-        }catch (Exception e){
-            System.out.println("content 為空 : "+e);
-        }
+        String content = docService.findContent(id);
+        resp.setContent(content);
         return resp;
     }
 }
