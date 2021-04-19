@@ -44,7 +44,9 @@
                     </template>
                     <a-list-item-meta :description="item.description">
                         <template #title>
-                            <a :href="item.href">{{ item.name }}</a>
+                            <router-link :to="'/doc?ebookId=' + item.id">
+                                {{ item.name }}
+                            </router-link>
                         </template>
                         <template #avatar>
                             <a-avatar :src="item.cover"/>
@@ -107,7 +109,7 @@
             let categoryId2 = 0;
             let categoryId1 = 0;
 
-            const handleQueryEbook = (categoryId1: any=null) => {
+            const handleQueryEbook = (categoryId1: any = null) => {
                 //判斷是否有一級分類,如果有則按照衣及分類搜尋列表,如果沒有則搜尋二級分類
                 if (categoryId1) {
                     axios.get("/ebook/list", {
