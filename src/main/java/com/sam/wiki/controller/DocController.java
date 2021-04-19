@@ -49,6 +49,5 @@ public class DocController {
         List<String> list = Arrays.asList(idStr.split(","));
         docService.delete(list);
         return resp;
-
     }
 }

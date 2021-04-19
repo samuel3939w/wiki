@@ -52,7 +52,7 @@
             </a-col>
             <a-col :span="16">
                 <p>
-                    <a-form layout="inline" :model="param">
+                    <a-form layout="inline">
                         <a-form-item>
                             <a-button type="primary" @click="handleSave()">
                                 保存
@@ -172,7 +172,8 @@
             // 因为树选择组件的属性状态，会随当前编辑的节点而变化，所以单独声明一个响应式变量
             const treeSelectData = ref();
             treeSelectData.value = [];
-            const doc = ref({});
+            const doc = ref();
+            doc.value={};
             const modalVisible = ref(false);
             const modalLoading = ref(false);
             const editor = new E('#content');
@@ -180,6 +181,7 @@
 
             const handleSave = () => {
                 modalLoading.value = true;
+                doc.value.content = editor.txt.html();
                 axios.post("/doc/save", doc.value).then((response) => {
                     modalLoading.value = false;
                     const data = response.data; // data = commonResp
