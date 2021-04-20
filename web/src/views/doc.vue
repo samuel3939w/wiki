@@ -9,6 +9,7 @@
                             @select="onSelect"
                             :replaceFields="{title: 'name', key: 'id', value: 'id'}"
                             :defaultExpandAll="true"
+                            :defaultSelectedKeys="defaultSelectedKeys"
                     >
                     </a-tree>
                 </a-col>
@@ -33,6 +34,8 @@
             const route = useRoute();
             const docs = ref();
             const html = ref();
+            const defaultSelectedKeys = ref();
+            defaultSelectedKeys.value = [];
 
             /**
              * 一级文档树，children属性就是二级文档
@@ -49,6 +52,20 @@
             level1.value = [];
 
             /**
+             * 内容查询
+             **/
+            const handleQueryContent = (id: number) => {
+                axios.get("/doc/find-content/" + id).then((response) => {
+                    const data = response.data;
+                    if (data.success) {
+                        html.value = data.content;
+                    } else {
+                        message.error(data.message);
+                    }
+                });
+            };
+
+            /**
              * 数据查询
              **/
             const handleQuery = () => {
@@ -59,20 +76,11 @@
 
                         level1.value = [];
                         level1.value = Tool.array2Tree(docs.value, 0);
-                    } else {
-                        message.error(data.message);
-                    }
-                });
-            };
 
-            /**
-             * 内容查询
-             **/
-            const handleQueryContent = (id: number) => {
-                axios.get("/doc/find-content/" + id).then((response) => {
-                    const data = response.data;
-                    if (data.success) {
-                        html.value = data.content;
+                        if (Tool.isNotEmpty(level1)) {
+                            defaultSelectedKeys.value = [level1.value[0].id];
+                            handleQueryContent(level1.value[0].id);
+                        }
                     } else {
                         message.error(data.message);
                     }
@@ -94,7 +102,8 @@
             return {
                 level1,
                 html,
-                onSelect
+                onSelect,
+                defaultSelectedKeys
             }
         }
     });
@@ -107,14 +116,12 @@
         border-top: 1px solid #ccc;
         border-left: 1px solid #ccc;
     }
-
     .wangeditor table td,
     .wangeditor table th {
         border-bottom: 1px solid #ccc;
         border-right: 1px solid #ccc;
         padding: 3px 5px;
     }
-
     .wangeditor table th {
         border-bottom: 2px solid #ccc;
         text-align: center;
@@ -131,7 +138,7 @@
         background-color: #f1f1f1;
     }
 
-    /* code 樣式 */
+    /* code 样式 */
     .wangeditor code {
         display: inline-block;
         *display: inline;
@@ -141,7 +148,6 @@
         padding: 3px 5px;
         margin: 0 3px;
     }
-
     .wangeditor pre code {
         display: block;
     }
@@ -153,9 +159,37 @@
 
     /* 和antdv p冲突，覆盖掉 */
     .wangeditor blockquote p {
-        font-family: "YouYuan";
+        font-family:"YouYuan";
         margin: 20px 10px !important;
         font-size: 16px !important;
-        font-weight: 600;
+        font-weight:600;
+    }
+
+    /* 点赞 */
+    .vote-div {
+        padding: 15px;
+        text-align: center;
+    }
+
+    /* 图片自适应 */
+    .wangeditor img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    /* 视频自适应 */
+    .wangeditor iframe {
+        width: 100%;
+        height: 400px;
+    }
+
+    .wangeditor h1{
+        display: block;
+        font-size: 2em;
+        margin-block-start: 0.67em;
+        margin-block-end: 0.67em;
+        margin-inline-start: 0px;
+        margin-inline-end: 0px;
+        font-weight: bold;
     }
 </style>
