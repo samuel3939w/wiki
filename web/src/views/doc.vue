@@ -1,6 +1,7 @@
 <template>
     <a-layout>
         <a-layout-content :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }">
+            <h3 v-if="level1.length === 0">對不起，找不到相關文檔！</h3>
             <a-row>
                 <a-col :span="6">
                     <a-tree
@@ -116,12 +117,14 @@
         border-top: 1px solid #ccc;
         border-left: 1px solid #ccc;
     }
+
     .wangeditor table td,
     .wangeditor table th {
         border-bottom: 1px solid #ccc;
         border-right: 1px solid #ccc;
         padding: 3px 5px;
     }
+
     .wangeditor table th {
         border-bottom: 2px solid #ccc;
         text-align: center;
@@ -148,6 +151,7 @@
         padding: 3px 5px;
         margin: 0 3px;
     }
+
     .wangeditor pre code {
         display: block;
     }
@@ -159,10 +163,10 @@
 
     /* 和antdv p冲突，覆盖掉 */
     .wangeditor blockquote p {
-        font-family:"YouYuan";
+        font-family: "YouYuan";
         margin: 20px 10px !important;
         font-size: 16px !important;
-        font-weight:600;
+        font-weight: 600;
     }
 
     /* 点赞 */
@@ -183,13 +187,14 @@
         height: 400px;
     }
 
-    .wangeditor h1{
-        display: block;
+    .wangeditor h1 {
+        /*display: block;*/
         font-size: 2em;
-        margin-block-start: 0.67em;
-        margin-block-end: 0.67em;
-        margin-inline-start: 0px;
-        margin-inline-end: 0px;
-        font-weight: bold;
+        /*margin-block-start: 0.67em;*/
+        /*margin-block-end: 0.67em;*/
+        /*margin-inline-start: 0px;*/
+        /*margin-inline-end: 0px;*/
+        /*font-weight: bold;*/
     }
+
 </style>
