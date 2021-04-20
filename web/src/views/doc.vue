@@ -131,7 +131,7 @@
         background-color: #f1f1f1;
     }
 
-    /* code 样式 */
+    /* code 樣式 */
     .wangeditor code {
         display: inline-block;
         *display: inline;

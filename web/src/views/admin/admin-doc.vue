@@ -80,11 +80,21 @@
                         <a-input v-model:value="doc.sort" placeholder="順序"/>
                     </a-form-item>
                     <a-form-item>
+                        <a-button type="primary" @click="handlePreviewContent()">
+                            <EyeOutlined/>
+                            內容預覽
+                        </a-button>
+                    </a-form-item>
+                    <a-form-item>
                         <div id="content"></div>
                     </a-form-item>
                 </a-form>
             </a-col>
         </a-row>
+
+        <a-drawer width="900" placement="right" :closable="false" :visible="drawerVisible" @close="onDrawerClose">
+            <div class="wangeditor" :innerHTML="previewHtml"></div>
+        </a-drawer>
     </a-layout-content>
 
     <!--    <a-modal-->
@@ -167,7 +177,7 @@
                         console.log("樹狀結構:", level1);
 
                         // 父文档下拉框初始化，相当于点击新增
-                        treeSelectData.value = Tool.copy(level1.value);
+                        treeSelectData.value = Tool.copy(level1.value) || [];
                         // 为选择树添加一个"无"
                         treeSelectData.value.unshift({id: 0, name: '無'});
                     } else {
@@ -344,6 +354,18 @@
                 });
             }
 
+            // ----------------富文本预览--------------
+            const drawerVisible = ref(false);
+            const previewHtml = ref();
+            const handlePreviewContent = () => {
+                const html = editor.txt.html();
+                previewHtml.value = html;
+                drawerVisible.value = true;
+            };
+            const onDrawerClose = () => {
+                drawerVisible.value = false;
+            };
+
             onMounted(() => {
                 editor.create();
                 handleQuery();
@@ -367,7 +389,12 @@
                 handleDelete,
                 handleQuery,
 
-                treeSelectData
+                treeSelectData,
+
+                drawerVisible,
+                previewHtml,
+                handlePreviewContent,
+                onDrawerClose,
             }
         }
     });
