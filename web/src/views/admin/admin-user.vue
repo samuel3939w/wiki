@@ -60,7 +60,7 @@
             <a-form-item label="登入名">
                 <a-input v-model:value="user.loginName" />
             </a-form-item>
-            <a-form-item label="暱稱">
+            <a-form-item label="名稱">
                 <a-input v-model:value="user.name" />
             </a-form-item>
             <a-form-item label="密碼">
