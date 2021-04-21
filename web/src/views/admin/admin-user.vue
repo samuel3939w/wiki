@@ -6,7 +6,7 @@
             <p>
                 <a-form layout="inline" :model="param">
                     <a-form-item>
-                        <a-input v-model:value="param.loginName" placeholder="登入名">
+                        <a-input v-model:value="param.loginName" placeholder="帳號名">
                         </a-input>
                     </a-form-item>
                     <a-form-item>
@@ -31,6 +31,9 @@
             >
                 <template v-slot:action="{ text, record }">
                     <a-space size="small">
+                        <a-button type="primary" @click="resetPassword(record)">
+                            重置密碼
+                        </a-button>
                         <a-button type="primary" @click="edit(record)">
                             编辑
                         </a-button>
@@ -57,13 +60,26 @@
             @ok="handleModalOk"
     >
         <a-form :model="user" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
-            <a-form-item label="登入名">
+            <a-form-item label="帳號">
                 <a-input v-model:value="user.loginName" :disabled="!!user.id"/>
             </a-form-item>
             <a-form-item label="名稱">
                 <a-input v-model:value="user.name"/>
             </a-form-item>
             <a-form-item label="密碼" v-show="!user.id">
+                <a-input v-model:value="user.password"/>
+            </a-form-item>
+        </a-form>
+    </a-modal>
+
+    <a-modal
+            title="重置密碼"
+            v-model:visible="resetModalVisible"
+            :confirm-loading="resetModalLoading"
+            @ok="handleResetModalOk"
+    >
+        <a-form :model="user" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
+            <a-form-item label="新密碼">
                 <a-input v-model:value="user.password"/>
             </a-form-item>
         </a-form>
@@ -94,7 +110,7 @@
 
             const columns = [
                 {
-                    title: '登入名',
+                    title: '帳號',
                     dataIndex: 'loginName'
                 },
                 {
@@ -156,25 +172,53 @@
             const modalVisible = ref(false);
             const modalLoading = ref(false);
             const handleModalOk = () => {
+                const regex = /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,32}$/;
                 modalLoading.value = true;
 
-                user.value.password = hexMd5(user.value.password + KEY);
-
-                axios.post("/user/save", user.value).then((response) => {
+                //較驗user裡面的值
+                if (user.value.loginName == null || user.value.loginName == "") {
+                    message.error("【帳號】不能為空");
                     modalLoading.value = false;
-                    const data = response.data; // data = commonResp
-                    if (data.success) {
-                        modalVisible.value = false;
+                    return;
+                } else if (user.value.name == null || user.value.name == "") {
+                    message.error("【名稱】不能為空");
+                    modalLoading.value = false;
+                    return;
+                } else if (!regex.test(user.value.password)) {
+                    //密碼正則較驗
+                    message.error("【密碼】至少包含 數字和英文，長度6-32");
+                    modalLoading.value = false;
+                    return
+                } else {
+                    //解決加密後的password顯示在表單上的問題
+                    const userData = {
+                        id: null,
+                        loginName: null,
+                        name: null,
+                        password: null
+                    };
+                    userData.id = user.value.id;
+                    userData.loginName = user.value.loginName;
+                    userData.name = user.value.name;
+                    userData.password = hexMd5(user.value.password + KEY);
 
-                        // 重新加载列表
-                        handleQuery({
-                            page: pagination.value.current,
-                            size: pagination.value.pageSize,
-                        });
-                    } else {
-                        message.error(data.message);
-                    }
-                });
+                    axios.post("/user/save", userData).then((response) => {
+                        modalLoading.value = false;
+                        const data = response.data; // data = commonResp
+                        if (data.success) {
+                            modalVisible.value = false;
+
+                            // 重新加载列表
+                            handleQuery({
+                                page: pagination.value.current,
+                                size: pagination.value.pageSize,
+                            });
+                        } else {
+                            message.error(data.message);
+                        }
+                    });
+                }
+
             };
 
             /**
@@ -206,6 +250,50 @@
                 });
             };
 
+
+            // -------- 重置密碼 ---------
+            const resetModalVisible = ref(false);
+            const resetModalLoading = ref(false);
+            const handleResetModalOk = () => {
+                const regex = /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,32}$/;
+                resetModalLoading.value = true;
+
+                if (!regex.test(user.value.password)) {
+                    //密碼正則較驗
+                    message.error("【密碼】至少包含 數字和英文，長度6-32");
+                    resetModalLoading.value = false;
+                    return
+                } else {
+
+                    axios.post("/user/reset-password", user.value).then((response) => {
+                        resetModalLoading.value = false;
+                        const data = response.data; // data = commonResp
+                        if (data.success) {
+                            resetModalVisible.value = false;
+
+                            // 重新加载列表
+                            handleQuery({
+                                page: pagination.value.current,
+                                size: pagination.value.pageSize,
+                            });
+                        } else {
+                            message.error(data.message);
+                        }
+                    });
+                }
+
+            };
+
+            /**
+             * 重置密碼
+             */
+            const resetPassword = (record: any) => {
+                resetModalVisible.value = true;
+                user.value = Tool.copy(record);
+                user.value.password = null;
+            };
+
+
             onMounted(() => {
                 handleQuery({
                     page: 1,
@@ -230,7 +318,12 @@
                 modalLoading,
                 handleModalOk,
 
-                handleDelete
+                handleDelete,
+
+                resetModalVisible,
+                resetModalLoading,
+                handleResetModalOk,
+                resetPassword
             }
         }
     });

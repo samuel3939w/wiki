@@ -8,6 +8,7 @@ import com.sam.wiki.exception.BusinessException;
 import com.sam.wiki.exception.BusinessExceptionCode;
 import com.sam.wiki.mapper.UserMapper;
 import com.sam.wiki.req.UserQueryReq;
+import com.sam.wiki.req.UserResetPasswordReq;
 import com.sam.wiki.req.UserSaveReq;
 import com.sam.wiki.resp.UserQueryResp;
 import com.sam.wiki.resp.PageResp;
@@ -77,7 +78,7 @@ public class UserService {
                 //新增
                 user.setId(snowFlake.nextId());
                 userMapper.insert(user);
-            }else{
+            } else {
                 //用戶名已存在
                 throw new BusinessException(BusinessExceptionCode.USER_LOGIN_NAME_EXIST);
             }
@@ -104,5 +105,13 @@ public class UserService {
         } else {
             return userList.get(0);
         }
+    }
+
+    /**
+     * 修改密碼
+     */
+    public void resetPassword(UserResetPasswordReq req) {
+        User user = CopyUtil.copy(req, User.class);
+        userMapper.updateByPrimaryKeySelective(user);
     }
 }

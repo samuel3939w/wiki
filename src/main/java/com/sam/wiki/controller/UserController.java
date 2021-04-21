@@ -1,10 +1,11 @@
 package com.sam.wiki.controller;
 
 import com.sam.wiki.req.UserQueryReq;
+import com.sam.wiki.req.UserResetPasswordReq;
 import com.sam.wiki.req.UserSaveReq;
 import com.sam.wiki.resp.CommonResp;
-import com.sam.wiki.resp.UserQueryResp;
 import com.sam.wiki.resp.PageResp;
+import com.sam.wiki.resp.UserQueryResp;
 import com.sam.wiki.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
@@ -39,6 +40,14 @@ public class UserController {
     public CommonResp delete(@PathVariable Long id){
         CommonResp resp = new CommonResp<>();
         userService.delete(id);
+        return resp;
+    }
+
+    @PostMapping("/reset-password")
+    public CommonResp resetPassword(@Valid @RequestBody UserResetPasswordReq req){
+        req.setPassword(DigestUtils.md5DigestAsHex(req.getPassword().getBytes()));
+        CommonResp resp = new CommonResp<>();
+        userService.resetPassword(req);
         return resp;
     }
 }
