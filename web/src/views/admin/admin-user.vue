@@ -61,20 +61,23 @@
                 <a-input v-model:value="user.loginName" :disabled="!!user.id"/>
             </a-form-item>
             <a-form-item label="名稱">
-                <a-input v-model:value="user.name" />
+                <a-input v-model:value="user.name"/>
             </a-form-item>
             <a-form-item label="密碼">
-                <a-input v-model:value="user.password" />
+                <a-input v-model:value="user.password"/>
             </a-form-item>
         </a-form>
     </a-modal>
 </template>
 
 <script lang="ts">
-    import { defineComponent, onMounted, ref } from 'vue';
+    import {defineComponent, onMounted, ref} from 'vue';
     import axios from 'axios';
-    import { message } from 'ant-design-vue';
+    import {message} from 'ant-design-vue';
     import {Tool} from "@/utils/tool";
+
+    declare let hexMd5: any;
+    declare let KEY: any;
 
     export default defineComponent({
         name: 'AdminUser',
@@ -105,7 +108,7 @@
                 {
                     title: 'Action',
                     key: 'action',
-                    slots: { customRender: 'action' }
+                    slots: {customRender: 'action'}
                 }
             ];
 
@@ -154,6 +157,9 @@
             const modalLoading = ref(false);
             const handleModalOk = () => {
                 modalLoading.value = true;
+
+                user.value.password = hexMd5(user.value.password + KEY);
+
                 axios.post("/user/save", user.value).then((response) => {
                     modalLoading.value = false;
                     const data = response.data; // data = commonResp
