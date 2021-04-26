@@ -67,14 +67,14 @@
             // 登录
             const login = () => {
                 console.log("開始登入");
-                const userData = {
+                const loginData = {
                     loginName: "",
                     password: ""
                 };
                 loginModalLoading.value = true;
-                userData.loginName=loginUser.value.loginName;
-                userData.password = hexMd5(loginUser.value.password + KEY);
-                axios.post('/user/login', userData).then((response) => {
+                loginData.loginName=loginUser.value.loginName;
+                loginData.password = hexMd5(loginUser.value.password + KEY);
+                axios.post('/user/login', loginData).then((response) => {
                     loginModalLoading.value = false;
                     const data = response.data;
                     if (data.success) {
