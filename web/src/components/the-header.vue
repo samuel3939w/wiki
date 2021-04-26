@@ -21,6 +21,16 @@
             <a-menu-item key="/about">
                 <router-link to="/about">關於我們</router-link>
             </a-menu-item>
+            <a-popconfirm
+                    title="確認登出?"
+                    ok-text="是"
+                    cancel-text="否"
+                    @confirm="logout()"
+            >
+                <a class="login-menu" v-show="user.id">
+                    <span>登出</span>
+                </a>
+            </a-popconfirm>
             <a class="login-menu" v-show="user.id">
                 <span>您好: {{user.name}}</span>
             </a>
@@ -72,6 +82,7 @@
             const showLoginModal = () => {
                 loginModalVisible.value = true;
             };
+
             // 登录
             const login = () => {
                 console.log("開始登入");
@@ -88,7 +99,23 @@
                     if (data.success) {
                         loginModalVisible.value = false;
                         message.success("登入成功！");
-                        store.commit("setUser",user.value);
+                        store.commit("setUser",data.content);
+                    } else {
+                        message.error(data.message);
+                    }
+                });
+            };
+
+
+            // 登出
+            const logout = () => {
+                console.log("開始登出");
+
+                axios.get('/user/logout/'+ user.value.token).then((response) => {
+                    const data = response.data;
+                    if (data.success) {
+                        message.success("登出成功！");
+                        store.commit("setUser",{});
                     } else {
                         message.error(data.message);
                     }
@@ -101,7 +128,8 @@
                 showLoginModal,
                 loginUser,
                 login,
-                user
+                user,
+                logout
             }
         }
     });
@@ -111,5 +139,6 @@
     .login-menu {
         float: right;
         color: white;
+        padding-left: 10px;
     }
 </style>
