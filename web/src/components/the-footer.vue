@@ -1,6 +1,6 @@
 <template>
     <a-layout-footer style="text-align: center">
-        山姆電子書, 歡迎: {{user.name}}
+        山姆電子書<span v-show="user.id">, 歡迎: {{user.name}}</span>
     </a-layout-footer>
 </template>
 
