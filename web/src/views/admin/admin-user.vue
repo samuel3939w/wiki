@@ -67,7 +67,7 @@
                 <a-input v-model:value="user.name"/>
             </a-form-item>
             <a-form-item label="密碼" v-show="!user.id">
-                <a-input v-model:value="user.password"/>
+                <a-input v-model:value="user.password" type="password"/>
             </a-form-item>
         </a-form>
     </a-modal>
