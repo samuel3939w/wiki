@@ -7,9 +7,11 @@ import com.sam.wiki.domain.UserExample;
 import com.sam.wiki.exception.BusinessException;
 import com.sam.wiki.exception.BusinessExceptionCode;
 import com.sam.wiki.mapper.UserMapper;
+import com.sam.wiki.req.UserLoginReq;
 import com.sam.wiki.req.UserQueryReq;
 import com.sam.wiki.req.UserResetPasswordReq;
 import com.sam.wiki.req.UserSaveReq;
+import com.sam.wiki.resp.UserLoginResp;
 import com.sam.wiki.resp.UserQueryResp;
 import com.sam.wiki.resp.PageResp;
 import com.sam.wiki.utils.CopyUtil;
@@ -113,5 +115,27 @@ public class UserService {
     public void resetPassword(UserResetPasswordReq req) {
         User user = CopyUtil.copy(req, User.class);
         userMapper.updateByPrimaryKeySelective(user);
+    }
+
+    /**
+     * 登入
+     */
+    public UserLoginResp login(UserLoginReq req) {
+        User userDb = selectByLoginName(req.getLoginName());
+        if (ObjectUtils.isEmpty(userDb)) {
+            //用戶名不存在
+            LOG.info("用戶名不存在, {}", req.getLoginName());
+            throw new BusinessException(BusinessExceptionCode.LOGIN_USER_ERROR);
+        } else {
+            if (userDb.getPassword().equals(req.getPassword())) {
+                //登入成功
+             UserLoginResp userLoginResp=CopyUtil.copy(userDb,UserLoginResp.class);
+             return userLoginResp;
+            } else {
+                //密碼不對
+                LOG.info("密碼不對, 輸入密碼: {}, 數據庫密碼: {}", req.getPassword(), userDb.getPassword());
+                throw new BusinessException(BusinessExceptionCode.LOGIN_USER_ERROR);
+            }
+        }
     }
 }
