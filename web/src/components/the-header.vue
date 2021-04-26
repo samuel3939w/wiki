@@ -9,13 +9,13 @@
             <a-menu-item key="/">
                 <router-link to="/">首頁</router-link>
             </a-menu-item>
-            <a-menu-item key="/admin/user">
+            <a-menu-item key="/admin/user" :style="user.id? {} : {display:'none'}">
                 <router-link to="/admin/user">用戶管理</router-link>
             </a-menu-item>
-            <a-menu-item key="/admin/ebook">
+            <a-menu-item key="/admin/ebook" :style="user.id? {} : {display:'none'}">
                 <router-link to="/admin/ebook">電子書管理</router-link>
             </a-menu-item>
-            <a-menu-item key="/admin/category">
+            <a-menu-item key="/admin/category" :style="user.id? {} : {display:'none'}">
                 <router-link to="/admin/category">分類管理</router-link>
             </a-menu-item>
             <a-menu-item key="/about">
@@ -91,7 +91,7 @@
                     password: ""
                 };
                 loginModalLoading.value = true;
-                loginData.loginName=loginUser.value.loginName;
+                loginData.loginName = loginUser.value.loginName;
                 loginData.password = hexMd5(loginUser.value.password + KEY);
                 axios.post('/user/login', loginData).then((response) => {
                     loginModalLoading.value = false;
@@ -99,7 +99,7 @@
                     if (data.success) {
                         loginModalVisible.value = false;
                         message.success("登入成功！");
-                        store.commit("setUser",data.content);
+                        store.commit("setUser", data.content);
                     } else {
                         message.error(data.message);
                     }
@@ -111,11 +111,11 @@
             const logout = () => {
                 console.log("開始登出");
 
-                axios.get('/user/logout/'+ user.value.token).then((response) => {
+                axios.get('/user/logout/' + user.value.token).then((response) => {
                     const data = response.data;
                     if (data.success) {
                         message.success("登出成功！");
-                        store.commit("setUser",{});
+                        store.commit("setUser", {});
                     } else {
                         message.error(data.message);
                     }
