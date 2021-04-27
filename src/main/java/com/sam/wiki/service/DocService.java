@@ -5,6 +5,8 @@ import com.github.pagehelper.PageInfo;
 import com.sam.wiki.domain.Content;
 import com.sam.wiki.domain.Doc;
 import com.sam.wiki.domain.DocExample;
+import com.sam.wiki.exception.BusinessException;
+import com.sam.wiki.exception.BusinessExceptionCode;
 import com.sam.wiki.mapper.ContentMapper;
 import com.sam.wiki.mapper.DocMapper;
 import com.sam.wiki.mapper.DocMapperCust;
@@ -13,6 +15,8 @@ import com.sam.wiki.req.DocSaveReq;
 import com.sam.wiki.resp.DocQueryResp;
 import com.sam.wiki.resp.PageResp;
 import com.sam.wiki.utils.CopyUtil;
+import com.sam.wiki.utils.RedisUtil;
+import com.sam.wiki.utils.RequestContext;
 import com.sam.wiki.utils.SnowFlake;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 @Service
@@ -38,6 +43,9 @@ public class DocService {
 
     @Autowired
     private SnowFlake snowFlake;
+
+    @Resource
+    public RedisUtil redisUtil;
 
     public PageResp<DocQueryResp> list(DocQueryReq req) {
         DocExample docExample = new DocExample();
@@ -135,6 +143,13 @@ public class DocService {
      * 點讚
      */
     public void vote(Long id) {
-        docMapperCust.increaseVoteCount(id);
+        // docMapperCust.increaseVoteCount(id);
+        // 遠程IP+doc.id作為key，24小時内不能重複
+        String ip = RequestContext.getRemoteAddr();
+        if (redisUtil.validateRepeat("DOC_VOTE_" + id + "_" + ip, 3600 * 24)) {
+            docMapperCust.increaseVoteCount(id);
+        } else {
+            throw new BusinessException(BusinessExceptionCode.VOTE_REPEAT);
+        }
     }
 }

@@ -2,6 +2,7 @@ package com.sam.wiki.aspect;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.support.spring.PropertyPreFilters;
+import com.sam.wiki.utils.RequestContext;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
@@ -26,9 +27,12 @@ public class LogAspect {
 
     private final static Logger LOG = LoggerFactory.getLogger(LogAspect.class);
 
-    /** 定義一個切點 */
+    /**
+     * 定義一個切點
+     */
     @Pointcut("execution(public * com.sam.*.controller..*Controller.*(..))")
-    public void controllerPointcut() {}
+    public void controllerPointcut() {
+    }
 
     @Before("controllerPointcut()")
     public void doBefore(JoinPoint joinPoint) throws Throwable {
@@ -46,11 +50,13 @@ public class LogAspect {
         LOG.info("類名方法: {}.{}", signature.getDeclaringTypeName(), name);
         LOG.info("遠程地址: {}", request.getRemoteAddr());
 
+        RequestContext.setRemoteAddr(getRemoteIp(request));
+
         // 打印請求參數
         Object[] args = joinPoint.getArgs();
         // LOG.info("請求參數: {}", JSONObject.toJSONString(args));
 
-        Object[] arguments  = new Object[args.length];
+        Object[] arguments = new Object[args.length];
         for (int i = 0; i < args.length; i++) {
             if (args[i] instanceof ServletRequest
                     || args[i] instanceof ServletResponse
@@ -79,5 +85,25 @@ public class LogAspect {
         LOG.info("返回结果: {}", JSONObject.toJSONString(result, excludefilter));
         LOG.info("------------- 结束 耗時：{} ms -------------", System.currentTimeMillis() - startTime);
         return result;
+    }
+
+    /**
+     * 使用nginx做反向代理，需要用该方法才能取到真实的远程IP
+     *
+     * @param request
+     * @return
+     */
+    public String getRemoteIp(HttpServletRequest request) {
+        String ip = request.getHeader("x-forwarded-for");
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        return ip;
     }
 }
