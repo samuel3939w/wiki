@@ -24,6 +24,13 @@
                         <a-divider style="height:2px; background-color:#9999cc"></a-divider>
                     </div>
                     <div class="wangeditor" :innerHTML="html"></div>
+                    <div class="vote-div">
+                        <a-button type="primary" shape="round" :size="'large'" @click="vote">
+                            <template #icon>
+                                <LikeOutlined/> &nbsp;點讚：{{doc.voteCount}}
+                            </template>
+                        </a-button>
+                    </div>
                 </a-col>
             </a-row>
         </a-layout-content>
@@ -111,6 +118,18 @@
                 }
             };
 
+            // 點讚
+            const vote = () => {
+                axios.get('/doc/vote/' + doc.value.id).then((response) => {
+                    const data = response.data;
+                    if (data.success) {
+                        doc.value.voteCount++;
+                    } else {
+                        message.error(data.message);
+                    }
+                });
+            };
+
             onMounted(() => {
                 handleQuery();
             });
@@ -120,7 +139,8 @@
                 html,
                 onSelect,
                 defaultSelectedKeys,
-                doc
+                doc,
+                vote
             }
         }
     });
@@ -143,6 +163,12 @@
 
     .wangeditor table th {
         border-bottom: 2px solid #ccc;
+        text-align: center;
+    }
+
+    /* 點讚 */
+    .vote-div {
+        padding: 15px;
         text-align: center;
     }
 
