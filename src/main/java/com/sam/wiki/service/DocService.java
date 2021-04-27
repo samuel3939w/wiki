@@ -7,6 +7,7 @@ import com.sam.wiki.domain.Doc;
 import com.sam.wiki.domain.DocExample;
 import com.sam.wiki.mapper.ContentMapper;
 import com.sam.wiki.mapper.DocMapper;
+import com.sam.wiki.mapper.DocMapperCust;
 import com.sam.wiki.req.DocQueryReq;
 import com.sam.wiki.req.DocSaveReq;
 import com.sam.wiki.resp.DocQueryResp;
@@ -28,6 +29,9 @@ public class DocService {
 
     @Autowired
     private DocMapper docMapper;
+
+    @Autowired
+    private DocMapperCust docMapperCust;
 
     @Autowired
     private ContentMapper contentMapper;
@@ -89,6 +93,8 @@ public class DocService {
         if (ObjectUtils.isEmpty(req.getId())) {
             //新增
             doc.setId(snowFlake.nextId());
+            doc.setViewCount(0);
+            doc.setVoteCount(0);
             docMapper.insert(doc);
 
             content.setId(doc.getId());
@@ -116,6 +122,8 @@ public class DocService {
 
     public String findContent(Long id) {
         Content content = contentMapper.selectByPrimaryKey(id);
+        //文檔閱讀數+1
+        docMapperCust.increaseViewCount(id);
         if (ObjectUtils.isEmpty(content)) {
             return "";
         } else {

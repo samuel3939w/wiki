@@ -26,7 +26,7 @@ public class LoginInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         // 打印请求信息
-        LOG.info("------------- LoginInterceptor 开始 -------------");
+        LOG.info("------------- LoginInterceptor 開始 -------------");
         long startTime = System.currentTimeMillis();
         request.setAttribute("requestStartTime", startTime);
 
@@ -37,23 +37,23 @@ public class LoginInterceptor implements HandlerInterceptor {
         }
 
         String path = request.getRequestURL().toString();
-        LOG.info("接口登录拦截：，path：{}", path);
+        LOG.info("接口登入攔截：，path：{}", path);
 
         //获取header的token参数
         String token = request.getHeader("token");
-        LOG.info("登录校验开始，token：{}", token);
+        LOG.info("登入驗證開始，token：{}", token);
         if (token == null || token.isEmpty()) {
-            LOG.info( "token为空，请求被拦截" );
+            LOG.info( "token為空，請求被攔截" );
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return false;
         }
         Object object = redisTemplate.opsForValue().get(token);
         if (object == null) {
-            LOG.warn( "token无效，请求被拦截" );
+            LOG.warn( "token無效，請求被攔截" );
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return false;
         } else {
-            LOG.info("已登录：{}", object);
+            LOG.info("已登入：{}", object);
             return true;
         }
     }
@@ -61,7 +61,7 @@ public class LoginInterceptor implements HandlerInterceptor {
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
         long startTime = (Long) request.getAttribute("requestStartTime");
-        LOG.info("------------- LoginInterceptor 结束 耗时：{} ms -------------", System.currentTimeMillis() - startTime);
+        LOG.info("------------- LoginInterceptor 結束 耗時：{} ms -------------", System.currentTimeMillis() - startTime);
     }
 
     @Override

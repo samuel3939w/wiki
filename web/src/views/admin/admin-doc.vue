@@ -323,7 +323,9 @@
                 }
 
                 treeSelectData.value = Tool.copy(level1.value);
-
+                if(treeSelectData.value==null){
+                    treeSelectData.value=[];
+                }
                 // 为选择树添加一个"无"
                 treeSelectData.value.unshift({id: 0, name: '無'});
             };
