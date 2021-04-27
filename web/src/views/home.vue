@@ -37,10 +37,18 @@
             <template #renderItem="{ item }">
                 <a-list-item key="item.name">
                     <template #actions>
-                            <span v-for="{ type, text } in actions" :key="type">
-                            <component v-bind:is="type" style="margin-right: 8px"/>
-                               {{ text }}
-                            </span>
+                        <span>
+                            <component v-bind:is="'FileOutlined'" style="margin-right: 8px"/>
+                               {{ item.docCount }}
+                        </span>
+                        <span>
+                            <component v-bind:is="'UserOutlined'" style="margin-right: 8px"/>
+                               {{ item.viewCount }}
+                        </span>
+                        <span>
+                            <component v-bind:is="'LikeOutlined'" style="margin-right: 8px"/>
+                               {{ item.voteCount }}
+                        </span>
                     </template>
                     <a-list-item-meta :description="item.description">
                         <template #title>
@@ -59,7 +67,7 @@
 </template>
 
 <script lang="ts">
-    import {defineComponent, onMounted, ref, reactive, toRef} from "vue";
+    import {defineComponent, onMounted, ref} from "vue";
     import axios from "axios";
     import {message} from 'ant-design-vue';
     import {Tool} from "@/utils/tool";
@@ -168,16 +176,15 @@
                 },
                 pageSize: 3,
             };
-            const actions: Record<string, string>[] = [
-                {type: "StarOutlined", text: "156"},
-                {type: "LikeOutlined", text: "156"},
-                {type: "MessageOutlined", text: "2"},
-            ];
+            // const actions: Record<string, string>[] = [
+            //     {type: "StarOutlined", text: "156"},
+            //     {type: "LikeOutlined", text: "156"},
+            //     {type: "MessageOutlined", text: "2"},
+            // ];
 
             return {
                 ebooks,
                 pagination,
-                actions,
                 level1,
                 isShowWelcome,
 
