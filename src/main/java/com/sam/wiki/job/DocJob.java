@@ -20,7 +20,10 @@ public class DocJob {
      */
     @Scheduled(cron = "5/30 * * * * ?")
     public void cron() {
+        LOG.info("更新電子書下的文檔數據開始");
+        long start = System.currentTimeMillis();
         docService.updateEbookInfo();
+        LOG.info("更新電子書下的文檔數據結束，耗時：{}毫秒", System.currentTimeMillis() - start);
     }
 
 }
