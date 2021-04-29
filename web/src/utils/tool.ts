@@ -52,4 +52,22 @@ export class Tool {
         }
         return result;
     }
+
+    /**
+     * 隨機生成[len]長度的[radix]進制數
+     * @param len
+     * @param radix 默認62
+     * @returns {string}
+     */
+    public static uuid (len: number, radix = 62) {
+        const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
+        const uuid = [];
+        radix = radix || chars.length;
+
+        for (let i = 0; i < len; i++) {
+            uuid[i] = chars[0 | Math.random() * radix];
+        }
+
+        return uuid.join('');
+    }
 }
