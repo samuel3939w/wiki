@@ -8,6 +8,7 @@
     import {defineComponent, computed, onMounted} from 'vue';
     import store from "@/store";
     import {Tool} from "@/utils/tool";
+    import {notification} from 'ant-design-vue';
 
     export default defineComponent({
         name: 'the-footer',
@@ -21,6 +22,10 @@
             };
             const onMessage = (event: any) => {
                 console.log('WebSocket收到消息：', event.data);
+                notification["info"]({
+                    message:'收到消息',
+                    description:event.data
+                })
             };
             const onError = () => {
                 console.log('WebSocket連接錯誤，狀態碼：', websocket.readyState)
