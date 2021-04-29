@@ -18,7 +18,6 @@ import com.sam.wiki.utils.CopyUtil;
 import com.sam.wiki.utils.RedisUtil;
 import com.sam.wiki.utils.RequestContext;
 import com.sam.wiki.utils.SnowFlake;
-import com.sam.wiki.websocket.WebSocketServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,10 +44,10 @@ public class DocService {
     private SnowFlake snowFlake;
 
     @Autowired
-    private WebSocketServer webSocketServer;
+    public RedisUtil redisUtil;
 
     @Autowired
-    public RedisUtil redisUtil;
+    public WsService wsService;
 
     public PageResp<DocQueryResp> list(DocQueryReq req) {
         DocExample docExample = new DocExample();
@@ -157,7 +156,7 @@ public class DocService {
 
         //推送消息
         Doc docDb = docMapper.selectByPrimaryKey(id);
-        webSocketServer.sendInfo("【" + docDb.getName() + "】被點讚!");
+        wsService.sendInfo("【" + docDb.getName() + "】被點讚!");
     }
 
     public void updateEbookInfo() {
