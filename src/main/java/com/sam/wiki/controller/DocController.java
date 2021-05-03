@@ -2,8 +2,8 @@ package com.sam.wiki.controller;
 
 import com.sam.wiki.req.DocQueryReq;
 import com.sam.wiki.req.DocSaveReq;
-import com.sam.wiki.resp.DocQueryResp;
 import com.sam.wiki.resp.CommonResp;
+import com.sam.wiki.resp.DocQueryResp;
 import com.sam.wiki.resp.PageResp;
 import com.sam.wiki.service.DocService;
 import org.springframework.beans.factory.annotation.Autowired;
