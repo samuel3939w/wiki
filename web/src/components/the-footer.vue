@@ -17,6 +17,7 @@
 
             let websocket: any;
             let token: any;
+
             const onOpen = () => {
                 console.log('WebSocket連接成功，狀態碼：', websocket.readyState)
             };
