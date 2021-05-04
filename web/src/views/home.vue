@@ -25,7 +25,7 @@
     }"
     >
         <div class="welcome" v-show="isShowWelcome">
-            <h1>歡迎使用山姆知識庫</h1>
+            <the-welcome></the-welcome>
         </div>
         <a-list
                 v-show="!isShowWelcome"
@@ -71,6 +71,7 @@
     import axios from "axios";
     import {message} from 'ant-design-vue';
     import {Tool} from "@/utils/tool";
+    import TheWelcome from "@/components/the-welcome.vue";
 
     // const listData: Record<string, string>[] = [];
     //
@@ -88,6 +89,9 @@
 
     export default defineComponent({
         name: "Home",
+        components:{
+            TheWelcome
+        },
         setup() {
             const ebooks = ref();
             // const ebooks1 = reactive({books: []});
