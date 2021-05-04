@@ -3,15 +3,15 @@
 <mapper namespace="com.sam.wiki.mapper.EbookSnapshotMapperCust">
 
     <!--
-    # 方案一（ID不连续）：
-    #   删除今天的数据
-    #   为所有的电子书生成一条今天的记录
-    #   更新总阅读数、总点赞数
-    #   更新今日阅读数、今日点赞数
-    # 方案二（ID连续）：
-    #   为所有的电子书生成一条今天的记录，如果还没有
-    #   更新总阅读数、总点赞数
-    #   更新今日阅读数、今日点赞数
+    # 方案一（ID不連續）：
+    #   删除今天的數據
+    #   為所有的電子書生成一條今天的紀錄
+    #   更新總閱讀數、總點讚數
+    #   更新今日閱讀數、今日點讚數
+    # 方案二（ID連續）：
+    #   為所有的電子書生成一條今天的紀錄，如果還沒有
+    #   更新總閱讀數、總點讚數
+    #   更新今日閱讀數、今日點讚數
     -->
     <update id="genSnapshot">
         insert into ebook_snapshot(ebook_id, `date`, view_count, vote_count, view_increase, vote_increase)
@@ -37,7 +37,7 @@
         where t1.`date` = curdate();
     </update>
 
-    <!-- 获取首页数值数据：总阅读数、总点赞数、今日阅读数、今日点赞数、今日预计阅读数、今日预计阅读增长 -->
+    <!-- 獲取首頁數值數據：總閱讀數、總點讚數、今日閱讀數、今日點讚數、今日預計閱讀數、今日預計閱讀增長 -->
     <select id="getStatistic" resultType="com.sam.wiki.resp.StatisticResp">
         select
             t1.`date` as `date`,

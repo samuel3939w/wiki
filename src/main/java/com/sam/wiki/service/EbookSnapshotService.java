@@ -17,7 +17,7 @@ public class EbookSnapshotService {
     }
 
     /**
-     * 获取首页数值数据：总阅读数、总点赞数、今日阅读数、今日点赞数、今日预计阅读数、今日预计阅读增长
+     * 獲取首頁數值數據：總閱讀數、總點讚數、今日閱讀數、今日點讚數、今日預計閱讀數、今日預計閱讀增長
      */
     public List<StatisticResp> getStatistic() {
         return ebookSnapshotMapperCust.getStatistic();

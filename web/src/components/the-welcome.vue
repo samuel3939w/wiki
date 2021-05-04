@@ -1,14 +1,141 @@
 <template>
-    <h1>歡迎使用山姆知識庫1</h1>
+    <div>
+        <a-row>
+            <a-col :span="24">
+                <a-card>
+                    <a-row>
+                        <a-col :span="8">
+                            <a-statistic title="總閱讀量" :value="statistic.viewCount">
+                                <template #suffix>
+                                    <UserOutlined/>
+                                </template>
+                            </a-statistic>
+                        </a-col>
+                        <a-col :span="8">
+                            <a-statistic title="總點讚量" :value="statistic.voteCount">
+                                <template #suffix>
+                                    <like-outlined/>
+                                </template>
+                            </a-statistic>
+                        </a-col>
+                        <a-col :span="8">
+                            <a-statistic title="點讚率" :value="statistic.voteCount / statistic.viewCount * 100"
+                                         :precision="2"
+                                         suffix="%"
+                                         :value-style="{ color: '#cf1322' }">
+                                <template #suffix>
+                                    <like-outlined/>
+                                </template>
+                            </a-statistic>
+                        </a-col>
+                    </a-row>
+                </a-card>
+            </a-col>
+        </a-row>
+        <br>
+        <a-row :gutter="16">
+            <a-col :span="12">
+                <a-card>
+                    <a-row>
+                        <a-col :span="12">
+                            <a-statistic title="今日閱讀" :value="statistic.todayViewCount" style="margin-right: 50px">
+                                <template #suffix>
+                                    <UserOutlined/>
+                                </template>
+                            </a-statistic>
+                        </a-col>
+                        <a-col :span="12">
+                            <a-statistic title="今日點讚" :value="statistic.todayVoteCount">
+                                <template #suffix>
+                                    <like-outlined/>
+                                </template>
+                            </a-statistic>
+                        </a-col>
+                    </a-row>
+                </a-card>
+            </a-col>
+            <a-col :span="12">
+                <a-card>
+                    <a-row>
+                        <a-col :span="12">
+                            <a-statistic
+                                    title="預計今日閱讀"
+                                    :value="statistic.todayViewIncrease"
+                                    :value-style="{ color: '#0000ff' }"
+                            >
+                                <template #suffix>
+                                    <UserOutlined/>
+                                </template>
+                            </a-statistic>
+                        </a-col>
+                        <a-col :span="12">
+                            <a-statistic
+                                    title="預計今日閱讀增長"
+                                    :value="statistic.todayViewIncreaseRateAbs"
+                                    :precision="2"
+                                    suffix="%"
+                                    class="demo-class"
+                                    :value-style="statistic.todayViewIncreaseRate < 0 ? { color: '#3f8600' } : { color: '#cf1322' }"
+                            >
+                                <template #prefix>
+                                    <arrow-down-outlined v-if="statistic.todayViewIncreaseRate < 0"/>
+                                    <arrow-up-outlined v-if="statistic.todayViewIncreaseRate >= 0"/>
+                                </template>
+                            </a-statistic>
+                        </a-col>
+                    </a-row>
+                </a-card>
+            </a-col>
+        </a-row>
+        <br>
+        <a-row>
+            <a-col :span="24" id="main-col">
+                <div id="main" style="width: 100%;height:300px;"></div>
+            </a-col>
+        </a-row>
+    </div>
 </template>
 
 <script lang="ts">
-    import {defineComponent} from 'vue';
+    import {defineComponent, ref, onMounted} from 'vue'
+    import axios from 'axios';
 
     export default defineComponent({
         name: 'the-welcome',
         setup() {
+            const statistic = ref();
+            statistic.value = {};
 
+            const getStatistic = () => {
+                axios.get('/ebook-snapshot/get-statistic').then((response) => {
+                    const data = response.data;
+                    if (data.success) {
+                        const statisticResp = data.content;
+                        console.log(statisticResp[1]);
+                        statistic.value.viewCount = statisticResp[1].viewCount;
+                        statistic.value.voteCount = statisticResp[1].voteCount;
+                        statistic.value.todayViewCount = statisticResp[1].viewIncrease;
+                        statistic.value.todayVoteCount = statisticResp[1].voteIncrease;
+
+                        // 按分鐘計算當前時間點，佔一天的百分比
+                        const now = new Date();
+                        const nowRate = (now.getHours() * 60 + now.getMinutes()) / (60 * 24);
+                        // console.log(nowRate)
+                        statistic.value.todayViewIncrease = parseInt(String(statisticResp[1].viewIncrease / nowRate));
+                        // todayViewIncreaseRate：今日預計增長率
+                        statistic.value.todayViewIncreaseRate = (statistic.value.todayViewIncrease - statisticResp[0].viewIncrease) / statisticResp[0].viewIncrease * 100;
+                        statistic.value.todayViewIncreaseRateAbs = Math.abs(statistic.value.todayViewIncreaseRate);
+                    }
+                });
+            };
+
+            onMounted(() => {
+                getStatistic();
+            });
+
+            return {
+                statistic
+            }
         }
     });
 </script>
