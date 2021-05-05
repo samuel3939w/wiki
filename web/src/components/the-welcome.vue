@@ -100,6 +100,8 @@
     import {defineComponent, ref, onMounted} from 'vue'
     import axios from 'axios';
 
+    declare let echarts: any;
+
     export default defineComponent({
         name: 'the-welcome',
         setup() {
@@ -128,8 +130,93 @@
                 });
             };
 
+
+            const init30DayEcharts = (list: any) => {
+                // 發布生產後出現問題：切到別的頁面，再切回首頁，報表顯示不出來
+                // 解决方法：把原来的id=main的區域清空，重新初始化
+                const mainDom = document.getElementById('main-col');
+                if (mainDom) {
+                    mainDom.innerHTML = '<div id="main" style="width: 100%;height:300px;"></div>';
+                }
+                // 基于准备好的dom，初始化echarts實例
+                const myChart = echarts.init(document.getElementById('main'));
+
+                const xAxis = [];
+                const seriesView = [];
+                const seriesVote = [];
+                for (let i = 0; i < list.length; i++) {
+                    const record = list[i];
+                    xAxis.push(record.date);
+                    seriesView.push(record.viewIncrease);
+                    seriesVote.push(record.voteIncrease);
+                }
+
+                // 指定圖表的配置項和數據
+                const option = {
+                    title: {
+                        text: '30天趨勢圖'
+                    },
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    legend: {
+                        data: ['總閱讀量', '總點讚量']
+                    },
+                    grid: {
+                        left: '1%',
+                        right: '3%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    toolbox: {
+                        feature: {
+                            saveAsImage: {}
+                        }
+                    },
+                    xAxis: {
+                        type: 'category',
+                        boundaryGap: false,
+                        data: xAxis
+                    },
+                    yAxis: {
+                        type: 'value'
+                    },
+                    series: [
+                        {
+                            name: '總閱讀量',
+                            type: 'line',
+                            // stack: '總量', 不堆疊
+                            data: seriesView,
+                            smooth: true
+                        },
+                        {
+                            name: '總點讚量',
+                            type: 'line',
+                            // stack: '總量', 不堆叠
+                            data: seriesVote,
+                            smooth: true
+                        }
+                    ]
+                };
+
+                // 使用剛指定的配置項和數據顯示圖表。
+                myChart.setOption(option);
+            };
+
+            const get30DayStatistic = () => {
+                axios.get('/ebook-snapshot/get-30-statistic').then((response) => {
+                    const data = response.data;
+                    if (data.success) {
+                        const statisticList = data.content;
+
+                        init30DayEcharts(statisticList)
+                    }
+                });
+            };
+
             onMounted(() => {
                 getStatistic();
+                get30DayStatistic();
             });
 
             return {
